@@ -1,0 +1,7 @@
+/* The container family: the per-runtime menu and the New-folder init option.
+   Appended to the dashboard stylesheet after the components, so it may only ADD rules. */
+.container-menu-note { text-transform: none; font-weight: 400; opacity: .75; white-space: normal; }
+.container-menu-note code { white-space: normal; overflow-wrap: anywhere; }
+.container-absent { opacity: .75; }
+.container-absent:hover { opacity: 1; }
+.act-menu-container .uk-nav-header[data-group="project"] { text-transform: none; font-family: var(--font-code); }
