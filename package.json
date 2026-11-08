@@ -1,13 +1,19 @@
 {
-  "name": "@webship/workspace-container",
-  "version": "1.0.0",
+  "name": "@webship.co/workspace-container",
+  "version": "1.0.0-alpha1",
   "description": "The container family's shared base for Webship Workspace plugins: the ContainerRuntime contract, and the row menu (start, stop, restart, status, logs, shell, open the site, the runtime's own verbs), the state caption and the New-folder init option every runtime plugin registers through registerContainer(api, runtime).",
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
-  "private": true,
   "license": "ISC",
-  "repository": "github:webship/workspace-container",
-  "files": ["dist/src", "css", "README.md"],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/webship/workspace-container.git"
+  },
+  "files": [
+    "dist/src",
+    "css",
+    "README.md"
+  ],
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "prepare": "npm run build",
@@ -16,7 +22,10 @@
   },
   "devDependencies": {
     "@types/node": "^24.0.0",
-    "@webship/workspace-plugin-api": "github:webship/workspace-plugin-api#1.0.x",
+    "@webship.co/workspace-plugin-api": "^1.0.0-alpha1",
     "typescript": "^5.9.0"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
