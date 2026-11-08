@@ -1,11 +1,11 @@
-# @webship/workspace-container
+# @webship.co/workspace-container
 
 The container family's shared base for [Webship Workspace](https://github.com/webship/workspace)
-plugins. A runtime plugin (`@webship/workspace-docker`, `-lando`, `-docksal`, `-podman`,
+plugins. A runtime plugin (`@webship.co/workspace-docker`, `-lando`, `-docksal`, `-podman`,
 `-kubernetes`) is one call plus its runtime:
 
 ```ts
-import { registerContainer } from '@webship/workspace-container';
+import { registerContainer } from '@webship.co/workspace-container';
 export function register(api: PluginApi) { registerContainer(api, runtime); }
 ```
 

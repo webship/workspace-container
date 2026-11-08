@@ -8,7 +8,7 @@
  * tell whether it is up, and where the site answers.
  */
 
-import type { PluginLib } from '@webship/workspace-plugin-api';
+import type { PluginLib } from '@webship.co/workspace-plugin-api';
 
 /** The project as the runtime sees it. */
 export interface ContainerProject {
