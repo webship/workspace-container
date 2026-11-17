@@ -4,7 +4,7 @@ import fs from 'fs';
 import os from 'os';
 import path from 'path';
 
-import { registerContainer, detectByFiles } from '../src/index';
+import { registerContainer, detectByFiles, RUNTIME_ICONS, runtimeIcon } from '../src/index';
 import type { ContainerRuntime } from '../src/index';
 
 function fakeApi(root: string) {
@@ -102,4 +102,35 @@ test('the New-folder option runs the init command in the new folder', () => {
   assert.match(s.html('dev', {}), /name="acme" value="init"/);
   assert.deepStrictEqual(s.steps('dev', 'n', { acme: 'init' }), ["( cd 'n' && acme init --yes )"]);
   assert.deepStrictEqual(s.steps('dev', 'n', {}), []);
+});
+
+test('each of the five runtimes carries its own icon on the row, a runtime may name its own, an old dashboard keeps the server', () => {
+  // Five identical servers on one row could only be told apart by their words or a hover.
+  const five = ['docker', 'lando', 'docksal', 'podman', 'kubernetes'];
+  const icons = five.map((id) => runtimeIcon({ id }));
+  assert.strictEqual(new Set(icons).size, 5, `five different icons: ${icons.join(', ')}`);
+  assert.ok(icons.every((i) => /^tabler:[a-z0-9-]+$/.test(i)), "Tabler ids, drawn by the dashboard's iconHtml");
+  assert.ok(!icons.includes('tabler:server'), 'none of them is the shared server any more');
+  assert.deepStrictEqual(Object.keys(RUNTIME_ICONS).sort(), [...five].sort());
+  // Any other runtime keeps the server, and a runtime's own icon wins over the family's.
+  assert.strictEqual(runtimeIcon({ id: 'acme' }), 'tabler:server');
+  assert.strictEqual(runtimeIcon({ id: 'lando', icon: 'tabler:rocket' }), 'tabler:rocket');
+
+  // The button draws it with the dashboard's iconHtml.
+  const root = tree();
+  const row = { key: 'dev', project: 'site1', dir: path.join(root, 'dev'), allowed: new Set<string>(), vals: () => '' };
+  const withIcons = fakeApi(root);
+  withIcons.api.lib.iconHtml = (name: string, ratio?: number) => `<i data-icon="${name}" data-ratio="${ratio}"></i>`;
+  registerContainer(withIcons.api, { ...runtime, id: 'lando' });
+  const html = withIcons.calls.rowMenus.lando.fn(row);
+  assert.match(html, /title="Acme Runtime: acme\.yml"><i data-icon="tabler:chef-hat" data-ratio="0\.7"><\/i> ACME/);
+  assert.doesNotMatch(html, /uk-icon="icon: server/);
+  const own = fakeApi(root);
+  own.api.lib.iconHtml = (name: string) => `<i data-icon="${name}"></i>`;
+  registerContainer(own.api, { ...runtime, icon: 'tabler:rocket' });
+  assert.match(own.calls.rowMenus.acme.fn(row), /<i data-icon="tabler:rocket"><\/i> ACME/);
+  // A dashboard older than iconHtml: the server it always drew.
+  const old = fakeApi(root);
+  registerContainer(old.api, runtime);
+  assert.match(old.calls.rowMenus.acme.fn(row), /<span uk-icon="icon: server; ratio: \.7"><\/span> ACME/);
 });

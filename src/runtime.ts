@@ -42,6 +42,12 @@ export interface ContainerRuntime {
   label: string;
   /** The product's name in sentences: 'Lando'. */
   title: string;
+  /**
+   * The icon of its button on a project row: a Tabler icon id ('tabler:chef-hat'). Omitted: the base's own
+   * for a runtime it knows (RUNTIME_ICONS), else 'tabler:server'. Five runtimes on a row used to carry the
+   * same server, which only their words or a hover told apart.
+   */
+  icon?: string;
   /** The CLI: 'lando', 'fin', 'docker', 'podman', 'kubectl'. */
   cli: string;
   /** How to install it, for the message when it is missing. */

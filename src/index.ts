@@ -14,6 +14,25 @@ import type { ContainerProject, ContainerRuntime } from './runtime';
 
 export * from './runtime';
 
+/**
+ * A different icon for each runtime the family ships, so their buttons on one row can be told apart without
+ * hovering each one: the same server five times was the row's only picture of five different runtimes. Each
+ * says what the runtime is, not whose it is (no logos): several boxes from one compose file, a chef's hat for
+ * Lando's recipes, an anchor for Docksal's dock, a capsule for a pod, a ship's wheel for Kubernetes.
+ */
+export const RUNTIME_ICONS: Readonly<Record<string, string>> = Object.freeze({
+  docker: 'tabler:box-multiple',
+  lando: 'tabler:chef-hat',
+  docksal: 'tabler:anchor',
+  podman: 'tabler:capsule',
+  kubernetes: 'tabler:steering-wheel',
+});
+
+/** The icon a runtime's button carries: its own, the family's for it, or the server. */
+export function runtimeIcon(r: Pick<ContainerRuntime, 'id' | 'icon'>): string {
+  return r.icon || RUNTIME_ICONS[r.id] || 'tabler:server';
+}
+
 /** The first of `files` that exists in the folder, as a project, or null. */
 export function detectByFiles(projectDir: string, files: string[]): ContainerProject | null {
   for (const f of files) {
@@ -24,6 +43,10 @@ export function detectByFiles(projectDir: string, files: string[]): ContainerPro
 
 export function registerContainer(api: PluginApi, r: ContainerRuntime): void {
   const { esc, workspaceDir, listProjects, screenAction, NAME_RE } = api.lib;
+  // The dashboard draws a Tabler icon by name; one older than iconHtml keeps the server it always had.
+  const icon = typeof api.lib.iconHtml === 'function'
+    ? api.lib.iconHtml(runtimeIcon(r), 0.7)
+    : '<span uk-icon="icon: server; ratio: .7"></span>';
   const post = (name: string) => `/actions/p/${api.name}/${name}`;
   const shq = (v: unknown) => `'${String(v).replace(/'/g, `'\\''`)}'`;
 
@@ -68,7 +91,7 @@ export function registerContainer(api: PluginApi, r: ContainerRuntime): void {
       else groups.other.push(html);
     }
     return `<span class="act-with-status"><div class="uk-inline act-menu act-menu-${esc(r.id)} act-menu-container">
-        <button class="uk-button uk-button-default uk-button-small" type="button" title="${esc(r.title)}: ${esc(p.file)}"><span uk-icon="icon: server; ratio: .7"></span> ${esc(r.label)} <span uk-icon="icon: chevron-down; ratio: .6"></span></button>
+        <button class="uk-button uk-button-default uk-button-small" type="button" title="${esc(r.title)}: ${esc(p.file)}">${icon} ${esc(r.label)} <span uk-icon="icon: chevron-down; ratio: .6"></span></button>
         <div uk-dropdown="mode: click; pos: bottom-right"><ul class="uk-nav uk-dropdown-nav">
           <li class="uk-nav-header" data-group="project">${esc(p.name || project)} · ${esc(p.file)}</li>
           ${p.url ? `<li><a href="${esc(p.url)}" target="_blank" rel="noopener"><span uk-icon="icon: link-external; ratio: .7"></span> Open the site</a></li>` : ''}
